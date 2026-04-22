@@ -2,9 +2,47 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>Hallo Welt</title>
+  <title>Wetter Den Haag</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: #e8f4f8;
+    }
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 40px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    h1 { margin: 0 0 8px; font-size: 1.5rem; color: #333; }
+    .temp { font-size: 4rem; font-weight: bold; color: #2196F3; margin: 16px 0; }
+    .info { color: #666; font-size: 1rem; }
+  </style>
 </head>
 <body>
-  <h1>Hallo Welt! 👋</h1>
+  <div class="card">
+    <h1>📍 Den Haag</h1>
+    <div class="temp" id="temp">...</div>
+    <div class="info" id="info">Wetter wird geladen...</div>
+  </div>
+
+  <script>
+    fetch('https://api.open-meteo.com/v1/forecast?latitude=52.07&longitude=4.30&current=temperature_2m,weathercode,windspeed_10m&timezone=Europe/Amsterdam')
+      .then(r => r.json())
+      .then(data => {
+        const c = data.current;
+        document.getElementById('temp').textContent = c.temperature_2m + '°C';
+        document.getElementById('info').textContent = 'Wind: ' + c.windspeed_10m + ' km/h';
+      })
+      .catch(() => {
+        document.getElementById('info').textContent = 'Fehler beim Laden';
+      });
+  </script>
 </body>
 </html>
