@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Wetter Den Haag</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: sans-serif;
+      background: #e8f4f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .card {
+      background: white;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      text-align: center;
+      min-width: 300px;
+    }
+    h1 { color: #333; margin-bottom: 8px; }
+    .temp { font-size: 4rem; font-weight: bold; color: #2196F3; margin: 16px 0; }
+    .info { color: #666; margin-bottom: 24px; }
+    .user { font-size: 0.85rem; color: #999; margin-bottom: 16px; }
+    button {
+      padding: 10px 20px;
+      background: #f44336;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    button:hover { background: #d32f2f; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>📍 Den Haag</h1>
+    <div class="user" id="user"></div>
+    <div class="temp" id="temp">...</div>
+    <div class="info" id="info">Wetter wird geladen...</div>
+    <button onclick="logout()">Ausloggen</button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const supabase = window.supabase.createClient(
+      'https://ogennuabttnskcbfkmol.supabase.co',
+      'sb_publishable_kLlJmJGp7U5rZQMJ7I1_mg_ZUFxODmV'
+    );
+
+    async function init() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        window.location.href = 'index.html';
+        return;
+      }
+      document.getElementById('user').textContent = '👤 ' + session.user.email;
+      loadWeather();
+    }
+
+    async function loadWeather() {
+      const res = await fetch('/api/weather');
+      const data = await res.json();
+      document.getElementById('temp').textContent = data.temperature + '°C';
+      document.getElementById('info').textContent = 'Wind: ' + data.windspeed + ' km/h';
+    }
+
+    async function logout() {
+      await supabase.auth.signOut();
+      window.location.href = 'index.html';
+    }
+
+    init();
+  </script>
+</body>
+</html>
